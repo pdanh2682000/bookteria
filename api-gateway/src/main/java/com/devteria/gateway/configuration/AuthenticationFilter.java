@@ -24,6 +24,9 @@ import reactor.netty.http.server.HttpServerResponse;
 
 import java.util.List;
 
+/**
+ * class config to catch every when request arrive
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -44,17 +47,23 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         String token = authHeader.getFirst().replace("Bearer ", "");
         log.info("Token: {}", token);
 
+//        identityService.introspect(token).subscribe(introspectResponseApiResponse -> {
+//            log.info("Result: {}", introspectResponseApiResponse.getResult().isValid());
+//        });
+
         return identityService.introspect(token).flatMap(introspectResponse -> {
             if (introspectResponse.getResult().isValid())
                 return chain.filter(exchange);
             else
                 return unauthenticated(exchange.getResponse());
-        }).onErrorResume(throwable -> unauthenticated(exchange.getResponse()));
+        })
+            // case if have any other error
+            .onErrorResume(throwable -> unauthenticated(exchange.getResponse()));
     }
 
     @Override
     public int getOrder() {
-        return -1;
+        return -1; // ensure is first filter
     }
 
     Mono<Void> unauthenticated(ServerHttpResponse response){
