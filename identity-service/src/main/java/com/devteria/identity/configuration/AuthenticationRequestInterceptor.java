@@ -7,6 +7,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+/**
+ * class config to add header when call api among microservice
+ * Note: not use @Bean to config because it only apply for some clients
+ */
 @Slf4j
 public class AuthenticationRequestInterceptor implements RequestInterceptor {
     @Override
